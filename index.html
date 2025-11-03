@@ -15,20 +15,116 @@
     .container {
         width: 600px;
         height: 350px;
-        background: aliceblue;
-        box-shadow: 0 0 10px rgba(0,0,0,0.1);
         overflow-x: auto;
         overflow-y: hidden;
         position: relative;
         scroll-behavior: smooth;
+        margin: 0 auto;
     }
 
     #g-plate-box {
         position: relative;
     }
 
- 
- 
+    /* Animation styles for labels */
+    .g-labels {
+        opacity: 0;
+        transform: translateY(20px) scale(0.9);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+
+    .g-labels.visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+
+    /* Animation styles for the main image */
+    #g-plate-Artboard_2-img {
+        transition: transform 0.3s ease-out, filter 0.3s ease-out;
+    }
+
+    /* Individual plate items - we'll animate these as they come into view */
+    .plate-item {
+        position: absolute;
+        top: 0;
+        height: 100%;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.6s ease, transform 0.6s ease;
+        pointer-events: none;
+    }
+
+    .plate-item.visible {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* Optional: Add a subtle pulse effect when visible */
+    .g-labels.visible p {
+        animation: fadeIn 0.6s ease;
+    }
+
+    @keyframes fadeIn {
+        0% {
+            opacity: 0;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    /* Optional: Stagger the animation of text elements */
+    .g-labels.visible .g-pstyle0 {
+        animation: slideUp 0.5s ease;
+    }
+
+    .g-labels.visible .g-pstyle1 {
+        animation: slideUp 0.5s ease 0.1s backwards;
+    }
+
+    @keyframes slideUp {
+        0% {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .label {
+        margin-top: 10px;
+        font-size: 16px;
+        text-align: center;
+    }
+
+/* Blinking arrow for label */
+.label-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 6px solid transparent;
+    border-bottom: 6px solid transparent;
+    border-left: 10px solid #666;
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* Hide label when scrolled */
+.label.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
 </style>
 
 <!-- ai2html styles -->
@@ -57,8 +153,8 @@
 	#g-plate-Artboard_2 {
 		position:relative;
 		overflow:visible;
-		width: 2077px;
-		height: 350px;
+		width: 1850px;
+        height: 350px;
 	}
 	#g-plate-Artboard_2 p {
 		font-family:effra, sans-serif;
@@ -106,11 +202,19 @@
 <body>
 
 <div class="container" id="container">
-  
     <div id="g-plate-box" class="ai2html">
         <!-- Artboard: Artboard_2 -->
         <div id="g-plate-Artboard_2" class="g-artboard" data-aspect-ratio="5.934" data-min-width="0">
             <img id="g-plate-Artboard_2-img" class="g-plate-Artboard_2-img g-aiImg" alt="" src="plate-Artboard_2.jpg"/>
+            
+            <!-- Animated plate item overlays -->
+            <div id="plate-item-0" class="plate-item" style="left: 0%; width: 20%;"></div>
+            <div id="plate-item-1" class="plate-item" style="left: 24%; width: 16%;"></div>
+            <div id="plate-item-2" class="plate-item" style="left: 40%; width: 14%;"></div>
+            <div id="plate-item-3" class="plate-item" style="left: 50%; width: 20%;"></div>
+            <div id="plate-item-4" class="plate-item" style="left: 68%; width: 14%;"></div>
+            <div id="plate-item-5" class="plate-item" style="left: 84%; width: 16%;"></div>
+            
             <div id="g-ai0-1" class="g-labels g-aiAbs g-aiPointText" style="top:88.0868%;margin-top:-21.3px;left:13.2605%;margin-left:-69px;width:138px;">
                 <p class="g-pstyle0">3 oz of chicken</p>
                 <p class="g-pstyle1">19 g</p>
@@ -139,141 +243,71 @@
     </div>
 </div>
 
-
+<div class="label">
+    Scroll to see protein content per plate item 
+    <span class="label-arrow"></span>
+</div>
 <script>
     const items = [
-        { left: 13.2605, width: 138 },   // chicken
-        { left: 33.6582, width: 141 },   // oats
-        { left: 47.2814, width: 155 },   // lentils
-        { left: 60.3871, width: 227 },   // cottage cheese
-        { left: 74.4114, width: 142 },   // skyr
-        { left: 90.4731, width: 129 }    // tuna
+        { left: 13.2605, element: 'g-ai0-1', plateItem: 'plate-item-0' },
+        { left: 33.6582, element: 'g-ai0-2', plateItem: 'plate-item-1' },
+        { left: 47.2814, element: 'g-ai0-3', plateItem: 'plate-item-2' },
+        { left: 60.3871, element: 'g-ai0-4', plateItem: 'plate-item-3' },
+        { left: 74.4114, element: 'g-ai0-5', plateItem: 'plate-item-4' },
+        { left: 90.4731, element: 'g-ai0-6', plateItem: 'plate-item-5' }
     ];
 
-    let currentIndex = 0;
-    let autoPlayInterval = null;
     const container = document.getElementById('container');
-    const artboard = document.getElementById('g-plate-Artboard_2');
+    const artboardWidth = 1850;
 
+    // Check which labels and plate items should be visible based on viewport
+    function updateVisibility() {
+        const scrollLeft = container.scrollLeft;
+        const viewportLeft = scrollLeft;
+        const viewportRight = scrollLeft + container.offsetWidth;
+        
+        // Add some margin for early trigger (items appear slightly before center)
+        const triggerMargin = 100;
 
-    function updateView() {
-        const artboardWidth = 1077;
-        const item = items[currentIndex];
-        
-        // Calculate the pixel position based on percentage
-        const itemCenterPx = (item.left / 100) * artboardWidth;
-        
-        // Scroll to center the item
-        const scrollTo = itemCenterPx - (container.offsetWidth / 2);
-        container.scrollLeft = Math.max(0, scrollTo);
-        
-        // Update highlights
-        document.querySelectorAll('.highlight').forEach((h, i) => {
-            h.classList.toggle('active', i === currentIndex);
-        });
-        
-        // Update buttons
-        prevBtn.disabled = currentIndex === 0;
-        nextBtn.disabled = currentIndex === items.length - 1;
-    }
-
-    function positionHighlights() {
-        const artboardWidth = 2077;
-        
-        items.forEach((item, i) => {
-            const highlight = document.getElementById(`highlight-${i}`);
+        items.forEach((item, index) => {
+            const label = document.getElementById(item.element);
+            const plateItem = document.getElementById(item.plateItem);
             const itemCenterPx = (item.left / 100) * artboardWidth;
-            const leftPx = itemCenterPx - (item.width / 2);
             
-            highlight.style.left = `${leftPx}px`;
-            highlight.style.width = `${item.width}px`;
+            // Check if item is in viewport with margin
+            const isInViewport = itemCenterPx >= (viewportLeft - triggerMargin) && 
+                               itemCenterPx <= (viewportRight + triggerMargin);
+            
+            if (isInViewport) {
+                // Stagger the plate item animation slightly before the label
+                setTimeout(() => {
+                    plateItem.classList.add('visible');
+                }, index * 50); // Slight stagger between items
+                
+                setTimeout(() => {
+                    label.classList.add('visible');
+                }, 100 + (index * 50)); // Label appears after plate item
+            } else {
+                // Optional: Remove class to re-animate when scrolling back
+                label.classList.remove('visible');
+                plateItem.classList.remove('visible');
+            }
         });
     }
 
-    function next() {
-        if (currentIndex < items.length - 1) {
-            currentIndex++;
-            updateView();
-        } else if (autoPlayInterval) {
-            stopAutoPlay();
+    // Listen for scroll events with throttling for better performance
+    let scrollTimeout;
+    container.addEventListener('scroll', () => {
+        if (scrollTimeout) {
+            clearTimeout(scrollTimeout);
         }
-    }
-
-    function previous() {
-        if (currentIndex > 0) {
-            currentIndex--;
-            updateView();
-        }
-    }
-
-    function reset() {
-        stopAutoPlay();
-        currentIndex = 0;
-        updateView();
-    }
-
-    function startAutoPlay() {
-        if (autoPlayInterval) return;
-        
-        playBtn.textContent = 'Stop';
-        autoPlayInterval = setInterval(() => {
-            if (currentIndex < items.length - 1) {
-                next();
-            } else {
-                reset();
-                setTimeout(() => {
-                    if (autoPlayInterval) next();
-                }, 500);
-            }
-        }, 2000);
-    }
-
-    function stopAutoPlay() {
-        if (autoPlayInterval) {
-            clearInterval(autoPlayInterval);
-            autoPlayInterval = null;
-            playBtn.textContent = 'Auto Play';
-        }
-    }
-
-    function toggleAutoPlay() {
-        if (autoPlayInterval) {
-            stopAutoPlay();
-        } else {
-            startAutoPlay();
-        }
-    }
-
-    // Event listeners
-    nextBtn.addEventListener('click', () => {
-        stopAutoPlay();
-        next();
-    });
-    
-    prevBtn.addEventListener('click', () => {
-        stopAutoPlay();
-        previous();
-    });
-    
-    playBtn.addEventListener('click', toggleAutoPlay);
-    resetBtn.addEventListener('click', reset);
-
-    // Keyboard navigation
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'ArrowRight') next();
-        if (e.key === 'ArrowLeft') previous();
-        if (e.key === ' ') {
-            e.preventDefault();
-            toggleAutoPlay();
-        }
+        scrollTimeout = setTimeout(updateVisibility, 10);
     });
 
-    // Initialize
+    // Initialize on load
     window.addEventListener('load', () => {
-        positionHighlights();
-        updateView();
+        updateVisibility();
     });
 </script>
-
 </body>
 </html>
