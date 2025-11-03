@@ -20,6 +20,9 @@
         position: relative;
         scroll-behavior: smooth;
         margin: 0 auto;
+        /* border: 3px solid #666; */
+        border-radius: 5px;
+       
     }
 
     #g-plate-box {
@@ -125,6 +128,61 @@
     pointer-events: none;
     transition: opacity 0.3s ease;
 }
+
+/* Hide arrow when scrolled to end */
+.scroll-indicator.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+/* Scroll arrow on the right side of container - FIXED POSITION */
+.scroll-indicator {
+    position: fixed;
+    right: calc(50% - 300px + 10px); /* Adjust based on your container width */
+    top: 15%;
+    transform: translateY(-50%);
+    z-index: 100;
+    pointer-events: none;
+}
+
+.scroll-indicator-arrow {
+    display: inline-block;
+    width: 0;
+    height: 0;
+    border-top: 12px solid transparent;
+    border-bottom: 12px solid transparent;
+    border-left: 16px solid #333;
+    animation: blinkAndSlide 1.5s ease-in-out infinite;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));
+}
+
+@keyframes blinkAndSlide {
+    0%, 100% {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    50% {
+        opacity: 0.3;
+        transform: translateX(5px);
+    }
+}
+
+/* Hide arrow when scrolled to end */
+.scroll-indicator.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.arrow {
+    display: inline-block;
+    vertical-align: middle;
+    margin-left: 4px;
+    width: 25px;
+    height: 25px;
+
+}
 </style>
 
 <!-- ai2html styles -->
@@ -155,6 +213,7 @@
 		overflow:visible;
 		width: 1850px;
         height: 350px;
+       
 	}
 	#g-plate-Artboard_2 p {
 		font-family:effra, sans-serif;
@@ -241,11 +300,17 @@
             </div>
         </div>
     </div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+        <div class="scroll-indicator-arrow"></div>
+    </div>
 </div>
 
 <div class="label">
     Scroll to see protein content per plate item 
-    <span class="label-arrow"></span>
+<span class="arrow">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><path d="m31.71 15.29-10-10-1.42 1.42 8.3 8.29H0v2h28.59l-8.29 8.29 1.41 1.41 10-10a1 1 0 0 0 0-1.41z" data-name="3-Arrow Right"/></svg>
+</span>
 </div>
 <script>
     const items = [
@@ -308,6 +373,15 @@
     window.addEventListener('load', () => {
         updateVisibility();
     });
+
+    // In your updateVisibility function, add:
+const maxScroll = container.scrollWidth - container.offsetWidth;
+const scrollIndicator = document.getElementById('scrollIndicator');
+if (scrollLeft >= maxScroll - 10) {
+    scrollIndicator.classList.add('hidden');
+} else {
+    scrollIndicator.classList.remove('hidden');
+}
 </script>
 </body>
 </html>
