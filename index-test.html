@@ -13,9 +13,8 @@
     }
     
     .container {
-        width: 100%;
-        max-width: 600px;
-        height: 300px;
+        width: 600px;
+        height: 350px;
         overflow-x: auto;
         overflow-y: hidden;
         position: relative;
@@ -137,10 +136,11 @@
     transition: opacity 0.3s ease;
 }
 
+/* Scroll arrow on the right side of container - FIXED POSITION */
 .scroll-indicator {
     position: fixed;
     right: calc(50% - 300px + 10px); /* Adjust based on your container width */
-    top: 150px;
+    top: 50%;
     transform: translateY(-50%);
     z-index: 100;
     pointer-events: none;
@@ -211,8 +211,8 @@
 	#g-plate-Artboard_2 {
 		position:relative;
 		overflow:visible;
-		width: 1800px;
-        height: 300px;
+		width: 1850px;
+        height: 350px;
        
 	}
 	#g-plate-Artboard_2 p {
@@ -323,7 +323,7 @@
     ];
 
     const container = document.getElementById('container');
-    const artboardWidth = 1800;
+    const artboardWidth = 1850;
 
     // Check which labels and plate items should be visible based on viewport
     function updateVisibility() {
